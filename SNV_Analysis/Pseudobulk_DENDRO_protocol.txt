@@ -1,0 +1,36 @@
+0. Prep work and files to get
+    - Install GATK4
+    - Install the Sinto python package and its dependencies
+    - Install the DENDRO R package and its dependencies
+    - GRCh38 primary assembly .fa file, with companion .dict, .p7.dict, .fai, .p7.fai, and .fa.fai files
+    - autosomal.interval_list defining autosomal intervals
+    - Known_Sites, converted to hg38 without 'chr' in Chromosomal names, using chr_name_conv.txt and Convert_VCF_GRCh38.sh
+
+1. Obtain BAM files output from DropEst pipeline detailed in https://github.com/Ken-Lau-Lab/STAR_Protocol, should be a filtered and sorted 
+
+2. Index the target BAM files with the bash script, Index_BAMs_Parallel.sh
+
+3. Follow Pseudobulk_Barcodes.ipynb to perform KMeans clustering, with K=20
+
+4. Follow Prepare_Sinto_Barcodes.ipynb to prepare barcode files for Sinto 
+
+5. For each target BAM, prepare proper output directories organized as such: 
+    - {sample_ID}_Split_BAM ; This directory will be populated with 20 individual BAM files according to the Sinto split
+    - {sample_ID}_Split_BAM_intermediate ; This directory will be populated with intermediately processed BAM files corresponding to the 20 split BAMs
+    - {sample_ID}_Split_BAM_vcf ; This directory will be populated with final .vcf files after processing with the GATK4 pipeline in parallel
+    
+6. Activate environment with GATK4 and Sinto installed, prepare the bash script Sinto_Split.sh with proper path variables, then run it IN THE OUTPUT DIRECTORY, as it will output all files where it is run
+
+7. Follow Parallel_GATK4_Python.ipynb, ensure variables are pointed at correct locations, only variables that change each run are the split bam directory IDs, ensure "GATK4_pipe_to_BSQR.sh" and "GATK4_pipe_Haplotype.sh" are executable bash scripts.
+
+8. Use GATK4_Create_GenomicsDB.sh to create a GenomicsDB for scalable genotyping, followed by GATK4_GenotypeGVCFs.sh. Ensure all paths point to the proper locations.
+
+9. Annotate the vcf file and output as csv with Run_ANNOVAR_and_Convert.ipynb. Ensure correct paths and excutability of bash file
+
+10. Format vcf for DENDRO using https://github.com/zhouzilu/DENDRO/blob/master/script/vcf_to_DENDROinput.R, this will output a readable .rda file.
+
+11. Perform DENDRO analysis with http://raw.githack.com/zhouzilu/DENDRO/master/vignette/DENDRO_vignette.html, dendrograms and filtered variant indices can be obtained from the qcd object.
+
+12. Save qcd$dist as a matrix file, calculated in 3.3.1 of vignette from step 11.
+
+13. Follow Genetic_Divergence_Analysis.ipynb to analyze the pairwise distance matrix from step 12.
