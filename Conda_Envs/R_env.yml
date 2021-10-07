@@ -1,4 +1,4 @@
-name: R_402
+name: R_env
 channels:
   - anaconda
   - conda-forge
@@ -134,4 +134,3 @@ dependencies:
   - pip:
     - et-xmlfile==1.1.0
     - openpyxl==3.0.9
-prefix: /home/bob/anaconda3/envs/R_402
